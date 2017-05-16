@@ -1,0 +1,250 @@
+#include "stdafx.h"
+#include "iostream"
+
+using namespace System;
+using namespace std;
+
+struct nodo
+{
+	int dato;
+	nodo *sig;
+};
+
+class Lsec
+{
+private:
+	nodo *inicial;
+	nodo *buscarLista(int clave);
+	nodo *buscarUltimo();
+public:
+	Lsec();
+	~Lsec();
+	void agregar();
+	void eliminar(int &codigo);
+	void desplegarLista();
+};
+
+Lsec::Lsec()
+{
+	inicial = NULL;
+}
+
+Lsec::~Lsec()
+{
+	nodo *apun = inicial;
+	if (inicial == NULL);
+	else
+	{
+		do
+		{
+			inicial = apun->sig;
+			delete apun;
+			apun = inicial;
+		} while (apun != inicial);
+	}
+}
+
+void Lsec::desplegarLista()
+{
+	if (inicial == NULL)
+	{
+		cout << "La lista esta vacia" << endl;
+	}
+	else
+	{
+		nodo *apunt;
+		apunt = inicial;
+		do
+		{
+			cout << apunt->dato << "  ";
+			apunt = apunt->sig;
+		} while (apunt != inicial);
+	}
+	cout << endl;
+}
+
+nodo *Lsec::buscarUltimo()
+{
+	nodo *ultimo;
+	ultimo = inicial;
+	while (ultimo->sig != inicial)
+	{
+		ultimo = ultimo->sig;
+	}
+	return ultimo;
+}
+
+nodo *Lsec::buscarLista(int clave)
+{
+	nodo *anterior;
+	anterior = NULL;
+	if (inicial == NULL)
+	{
+		return anterior;
+	}
+	else
+	{
+		if (clave <= inicial->dato) //Si es verdad significa que debe ir de primero
+		{
+			return anterior;
+		}
+		else
+		{
+			anterior = inicial;
+			while ((clave > anterior->sig->dato) && (anterior->sig != inicial))
+			{
+				//Aqui compara el valor de cada dato
+				anterior = anterior->sig;
+			}
+			return anterior;
+		}
+	}
+	
+}
+
+void Lsec::eliminar(int &codigo)
+{
+	//Elimina el nodo siguiente al dado
+	//nodo *elimina = apun->sig;
+	//apun->sig = elimina->sig;
+	//delete elimina;
+
+	//Elimina el nodo apuntado por apun
+	nodo *apun;
+	nodo *aux;
+	nodo *ultimo;
+	//Evalua si el codigo existe
+
+
+	apun = buscarLista(codigo);
+	//si el nodo a eliminar es el primero regresa NULL
+	//De lo contrario me devuelve el que antecede a eliminar
+
+	aux = inicial;
+	if (apun == NULL) //Es por que es el primero el que voy a eliminar
+	{
+		if (inicial!=NULL && aux->dato == codigo)
+		{
+			if (inicial->sig == inicial)
+			{
+				inicial = NULL;
+			}
+			else
+			{
+				ultimo = buscarUltimo();
+				ultimo->sig = inicial->sig;
+				inicial = inicial->sig;
+				delete aux;
+			}
+		}
+		else
+		{
+			cout << "El nodo a eliminar no existe" << endl;
+		}
+	}
+	else
+	{
+		if (apun->sig != NULL) // Si es verdadero es porque codigo es menor que el maximo codigo entre los nodos
+		{                    // Y apun seguira apuntando al nodo que antecede al eliminar
+			if (apun->sig->dato == codigo)
+			{
+				aux = apun->sig;
+				apun->sig = aux->sig;
+				delete aux;
+			}
+			else
+			{
+				cout << "El nodo a eliminar no existe" << endl;
+			}
+		}
+		else  //De lo contrario es porque codigo es mayor y apun sera igual al ultimo nodo
+		{
+			cout << "El nodo a eliminar no existe" << endl;
+		}
+	}
+}
+
+void Lsec::agregar()
+{
+	nodo *nuevo, *anterior;
+	char resp;
+	do
+	{
+		nuevo = new nodo();
+		cout << "Entre clave del nodo a agregar" << endl;
+		cin >> nuevo->dato;
+		if (inicial == NULL)
+		{
+			//Agregar el primer nodo a la lista
+			inicial = nuevo;
+			nuevo->sig = nuevo;
+		}
+		else
+		{
+			//Agrega a una lista que contiene al menos un nodo
+			anterior = buscarLista(nuevo->dato);
+
+			if (anterior == NULL)
+			{
+				//Agregar un nodo que queda de primero
+				//en unal ista que no estaba vacia
+				if (nuevo->dato == inicial->dato) cout << "El nodo a agregar ya existe" << endl;
+				else
+				{
+					nodo *ultimo;
+					ultimo = buscarUltimo();
+					ultimo->sig = nuevo;
+					nuevo->sig = inicial;
+					inicial = nuevo;
+				}
+			}
+			else
+			{
+				//
+				if (anterior->sig != NULL)
+				{
+					//Agregs un nodo que queda entre el
+					//primero y el ultimo
+					if (nuevo->dato == anterior->sig->dato) cout << "El nodo a agregar ya existe" << endl;
+					else
+					{
+						nuevo->sig = anterior->sig;
+						anterior->sig = nuevo;
+					}
+				}
+				else
+				{
+					//Agregar un nodo que queda de ultimo
+					//[...]
+					cout << "EN TU PUTA CARA"<<endl;
+					nuevo->sig = inicial;
+					anterior->sig = nuevo;
+				}
+			}
+		}
+		cout << "Desea agregar otro nodo? (s/n)" << endl;
+		cin >> resp;
+		resp = tolower(resp);
+	} while (resp == 's');
+}
+
+void main()
+{
+	Lsec l;
+	l.agregar();
+	l.desplegarLista();
+	char resp;
+	int codigo;
+	do
+	{
+		cout << endl;
+		cout << "Entre codigo clave (Digite codigo a eliminar)" << endl;
+		cin >> codigo;
+		l.eliminar(codigo);
+		cout << "Desea eliminar otro nodo (s/n)" << endl;
+		cin >> resp;
+		resp = tolower(resp);
+	} while (resp == 's');
+	l.desplegarLista();
+	system("Pause");
+}
